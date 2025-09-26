@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { MailIcon } from "lucide-react";
+import { Linkedin } from "lucide-react";
+
 
 export default function Footer() {
   // get the current time in UTC+1 time zone
@@ -29,12 +31,12 @@ export default function Footer() {
           <p className="text-xs text-muted-foreground">
             Made with ❤️ by{" "}
             <Link
-              href="https://github.com/wendoj"
+              href="https://github.com/Candy-Butcher"
               target="_blank"
               passHref
               className="text-foreground transition hover:text-primary"
             >
-              wendoj
+              aman
             </Link>
           </p>
           <hr className="hidden h-6 border-l border-muted md:flex" />
@@ -43,15 +45,16 @@ export default function Footer() {
             <p className="text-sm font-semibold">{time} UTC+1</p>
           </span>
         </span>
-        <Link
-          href="mailto:wendoj@proton.me"
-          passHref
-          className="text-xs text-muted-foreground hover:text-foreground"
+
+        {/* BRAND — add margin so it doesn't stick to "home" */}
+           <Link
+          href="https://www.linkedin.com/in/aman-chandre-14b919126/" className="mr-6"
+          // aria-label="Aman Chandre — Home"
+         // className="flex items-center gap-2 group"
         >
-          <Button variant={"outline"}>
-            <MailIcon className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:flex">wendoj@proton.me</span>
-          </Button>
+          
+<span className="text-lg font-semibold">LinkedIn</span>        
+        
         </Link>
       </div>
       <div className="h-1 bg-[radial-gradient(closest-side,#8486ff,#42357d,#5d83ff,transparent)] opacity-50" />

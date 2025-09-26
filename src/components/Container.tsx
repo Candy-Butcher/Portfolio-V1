@@ -7,6 +7,12 @@ import Footer from "@/components/Footer";
 import { useRouter } from "next/router";
 import Preloader from "@/components/Preloader";
 import styles from "@/styles/Container.module.css";
+import React from "react";
+import GradualBlur from "@/components/GradualBlur";
+import Image from "next/image";
+
+
+
 
 type IconProps = {
   ["data-hide"]: boolean;
@@ -39,8 +45,10 @@ const variants = {
 const navLinks = [
   { href: "#home", text: "Home" },
   { href: "#about", text: "About" },
+  { href: "#education", text: "Education" },
+    { href: "#experience", text: "Experience" },
   { href: "#projects", text: "Projects" },
-  { href: "#services", text: "Services" },
+
   { href: "#contact", text: "Contact" },
 ];
 
@@ -83,9 +91,9 @@ export default function Container(props: ContainerProps) {
   const { children, ...customMeta } = props;
   const router = useRouter();
   const meta = {
-    title: "Wendo",
-    description: `Full-stack website developer and TypeScript enthusiast.`,
-    image: "/assets/logo.webp",
+    title: "Aman Chandre Portfolio",
+    description: `Game Designer`,
+    image: "/assets/weblogo.png",
     type: "website",
     ...customMeta,
   };
@@ -140,45 +148,85 @@ export default function Container(props: ContainerProps) {
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </Head>
+
       <nav
         className={cn(
-          styles.nav,
-          isScrolled
-            ? "bg-gradient-to-br from-background to-transparent shadow-md backdrop-blur transition"
-            : "bg-transparent",
-        )}
-      >
-        <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              styles.burger,
-              "inline-flex transform items-center justify-center rounded-md p-2 transition-all duration-300 focus:outline-none",
-            )}
-            aria-controls="mobile-menu"
-            aria-expanded="false"
-          >
-            <span className="sr-only">Open main menu</span>
-            <MenuIcon data-hide={isOpen} />
-            <CrossIcon data-hide={!isOpen} />
-          </button>
-        </div>
-        <Link href="/">
-          <span className="text-lg font-semibold">wendo</span>
-        </Link>
+    "fixed inset-x-0 top-0 z-[60] relative",           // keep header fixed
+    styles.nav,
+    isScrolled ? "shadow-md" : ""
+  )}
+>
 
-        {/* Desktop menu */}
-        <ul className={styles["desktop-nav"]}>
-          {navLinks.map((link, i) => (
-            <NavItem
-              key={link.href}
-              href={link.href}
-              text={link.text}
-              i={i}
-              className="text-base"
-            />
-          ))}
-        </ul>
+        {/* glass background with gradual fade (behind header content) */}
+  <div className="pointer-events-none absolute inset-0 -z-10">
+    <GradualBlur
+      target="parent"
+      position="top"
+      height="100%"
+      strength={1.1}         // tune 0.9–1.4
+      divCount={4}           // 3–4 is smooth and light
+      curve="bezier"
+      opacity={1}
+      className="rounded-b-xl"
+    />
+
+       
+
+{/* subtle tint + hairline at bottom for separation */}
+    <div
+      className="absolute inset-0 rounded-b-xl"
+      style={{
+        background: "hsl(var(--background) / 0.30)",
+        boxShadow: "0 1px 0 hsl(var(--muted) / 0.55) inset",
+      }}
+    />
+  </div>
+
+  {/* mobile burger (unchanged) */}
+  <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
+    <button
+      onClick={() => setIsOpen(!isOpen)}
+      className={cn(
+        styles.burger,
+        "inline-flex transform items-center justify-center rounded-md p-2 transition-all duration-300 focus:outline-none",
+      )}
+      aria-controls="mobile-menu"
+      aria-expanded="false"
+    >
+      <span className="sr-only">Open main menu</span>
+      <MenuIcon data-hide={isOpen} />
+      <CrossIcon data-hide={!isOpen} />
+    </button>
+  </div>
+
+{/* BRAND — add margin so it doesn't stick to "home" */}
+  {/* <Link href="https://www.linkedin.com/in/aman-c-14b919126/" className="mr-6">
+    <span className="text-lg font-semibold">LinkedIn</span>
+  </Link> */}
+  {/* left brand */}
+  <Image
+    src="/assets/logo1.png"          // your file
+    alt="Aman Chandre logo"
+    width={120}
+    height={120}
+    priority
+  className="h-10 w-auto md:h-12 lg:h-14" 
+  />
+{/* <Link
+  href="/"
+  aria-label="Aman Chandre — Home"
+  className="flex items-center gap-2 group"
+>
+  
+  <span className="sr-only">Home</span>
+</Link> */}
+
+  {/* Desktop nav */}
+  <ul className={cn(styles["desktop-nav"], "gap-6")}>
+    {navLinks.map((link, i) => (
+      <NavItem key={link.href} href={link.href} text={link.text} i={i} className="text-base" />
+    ))}
+    </ul>
 
         {/* Mobile menu */}
         <AnimatePresence key="menu">
@@ -221,7 +269,7 @@ export default function Container(props: ContainerProps) {
                 {/* Footer */}
                 <div className="flex min-h-fit w-full flex-col space-y-8 px-[22px] py-10">
                   <span className="text-sm text-muted-foreground">
-                    © {new Date().getFullYear()} wendo. All rights reserved.
+                    © {new Date().getFullYear()} Aman. All rights reserved.
                   </span>
                 </div>
               </div>

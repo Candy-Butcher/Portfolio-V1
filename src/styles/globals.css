@@ -35,7 +35,51 @@
     --ring: 212.7 26.8% 83.9%;
 
     --radius: 0.5rem;
+
+  --page-bg: #0b0c12;          /* page background */
+  --dot-gap: 28px;             /* distance between dots */
+  --dot-size: 1.6px;           /* dot radius */
+  --dot-rgb: 124,90,255;       /* purple accent (R,G,B) */
   }
+
+  .dot-grid{
+  position: relative;
+  background-color: var(--page-bg);
+  isolation: isolate;          /* keep blend modes local */
+}
+
+/* dots layer */
+.dot-grid::before,
+.dot-grid::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.dot-grid::before{
+  /* a radial dot repeated as a grid */
+  background-image: radial-gradient(
+    circle,
+    rgba(var(--dot-rgb), .55) var(--dot-size),
+    transparent calc(var(--dot-size) + 0.6px)   /* fade to transparent, not black */
+  );
+  background-size: var(--dot-gap) var(--dot-gap);
+  background-position: 0 0;
+  background-repeat: repeat;
+  opacity:.22;                 /* <— tweak for darker/lighter dots */
+}
+
+/* center glow that tints dots smoothly */
+.dot-grid::after{
+  background: radial-gradient(
+    700px circle at 50% 50%,
+    rgba(var(--dot-rgb), .55) 0%,
+    rgba(var(--dot-rgb), .18) 40%,
+    rgba(var(--dot-rgb), 0) 70%
+  );
+  mix-blend-mode: plus-lighter;  /* fallback ‘screen’ also works */
+}
 }
 
 /* global elements */

@@ -2,20 +2,11 @@ import Container from "@/components/Container";
 import { useEffect, useRef, Suspense, useState } from "react";
 import styles from "@/styles/Home.module.css";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronRight,
-  Code2,
-  Frame,
-  SearchCheck,
-  Eye,
-  MonitorSmartphone,
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import Spline from "@splinetool/react-spline";
 import Link from "next/link";
-import { cn, scrollTo } from "@/lib/utils";
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
@@ -25,88 +16,733 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import VanillaTilt from "vanilla-tilt";
-import { motion } from "framer-motion";
+import SpotlightCard from "@/components/SpotlightCard";
+import dynamic from "next/dynamic";
+import StarBorder from "@/components/StarBorder";
+import GradientText from "@/components/GradientText";
+import MagicBento, { type BentoCardProps } from "@/components/MagicBento";
+// ⬇️ changed line: named import
+import ProjectGallery from "@/components/ProjectGallery";
+
+const ProfileCard = dynamic(() => import("@/components/ProfileCard"), {
+  ssr: false,
+});
 
 const aboutStats = [
   { label: "Years of experience", value: "3+" },
   { label: "Technologies mastered", value: "5+" },
-  { label: "Companies worked with", value: "15+" },
 ];
 
-const projects = [
+const SKILLS = [
+  "C++",
+  "Unreal Engine 5",
+  "Blueprints",
+  "Verse",
+  "Gameplay Systems",
+  "AI / Behavior Trees",
+  "Lyra / GAS",
+  "Multiplayer & Replication",
+  "Unity",
+  "Prototyping",
+  "Performance Profiling",
+  "Git / GitHub",
+];
+
+/* ---------------------------------------------------
+   Helpers for compact project definitions (#3—#16)
+-----------------------------------------------------*/
+type GalleryItem = {
+  src: string;
+  type: "image" | "video";
+  alt?: string;
+  poster?: string;
+};
+
+type BasicProject = {
+  label: string;               // "#3", "#4", ...
+  heroTitle: string;
+  tools: string;
+  length?: string;
+  description: string;
+  keyContrib: string[];
+  skills: string[];
+  backgroundUrl?: string;
+  backgroundPosition?: string;
+  scrim?: "radial" | "linear" | false;
+  frosted?: boolean;
+
+  /** per-project visuals (override). If omitted, falls back to DEFAULT_VISUALS */
+  galleryItems?: GalleryItem[];
+  galleryThumbHeight?: number;
+};
+
+/** Fallback visuals (used only when a project doesn't supply galleryItems) */
+const DEFAULT_VISUALS: BentoCardProps = {
+  label: "Visuals",
+  className:
+    "col-span-12 lg:col-start-1 lg:col-span-12 lg:row-start-3 lg:row-span-2",
+  description: (
+    <ProjectGallery
+      items={[
+        // { src: "/assets/vis/moses-01.jpg", type: "image", alt: "Museum scene 1" },
+        // { src: "/assets/vis/moses-02.jpg", type: "image", alt: "Museum scene 2" },
+        {
+          src: "/assets/projects/moses/thesis.mp4",
+          type: "video",
+          poster: "/assets/projects/moses/project2.png",
+        },
+        // { src: "/assets/vis/moses-03.jpg", type: "image", alt: "Dialogue system" },
+      ]}
+      thumbHeight={220}
+    />
+  ),
+};
+
+function visualsCard(
+  items: GalleryItem[],
+  thumbHeight = 220
+): BentoCardProps {
+  return {
+    label: "Visuals",
+    className:
+      "col-span-12 lg:col-start-1 lg:col-span-12 lg:row-start-3 lg:row-span-2",
+    description: <ProjectGallery items={items} thumbHeight={thumbHeight} />,
+  };
+}
+
+function makeCards(p: BasicProject): BentoCardProps[] {
+  const hero: BentoCardProps = {
+    label: p.label,
+    className:
+      "col-span-12 lg:col-start-1 lg:col-span-10 lg:row-start-1 lg:row-span-1",
+    backgroundFit: "cover",
+    // unify framing & frosted for all projects; allow background override
+    backgroundUrl: p.backgroundUrl ?? "/assets/projects/pygon/hero.jpg",
+    backgroundPosition: p.backgroundPosition ?? "50% 35%",
+    scrim: p.scrim ?? "radial",
+    frosted: p.frosted ?? true,
+    title: (
+      <div className="space-y-3">
+        <h2 className="text-3xl md:text-4xl font-semibold leading-tight">
+          {p.heroTitle}
+        </h2>
+        <p className="text-sm opacity-95">
+          <strong>Engine &amp; Tools:</strong> {p.tools}
+          {p.length ? (
+            <>
+              <br />
+              <strong>Project Length:</strong> {p.length}
+            </>
+          ) : null}
+        </p>
+      </div>
+    ),
+  };
+
+  const visuals =
+    p.galleryItems && p.galleryItems.length > 0
+      ? visualsCard(p.galleryItems, p.galleryThumbHeight)
+      : DEFAULT_VISUALS;
+
+  return [
+    hero,
+    {
+      label: "Key Skills Demonstrated",
+      className:
+        "col-span-12 lg:col-start-11 lg:col-span-2 lg:row-start-1 lg:row-span-1",
+      description: (
+        <ul className="list-disc pl-5 space-y-1 text-sm opacity-90">
+          {p.skills.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ul>
+      ),
+    },
+    {
+      label: "Description & Gameplay Logic",
+      className:
+        "col-span-12 md:col-span-6 lg:col-start-1 lg:col-span-6 lg:row-start-2 lg:row-span-1",
+      description: <p className="text-sm leading-6 opacity-90">{p.description}</p>,
+    },
+    {
+      label: "Key Contributions",
+      className:
+        "col-span-12 md:col-span-6 lg:col-start-7 lg:col-span-6 lg:row-start-2 lg:row-span-1",
+      description: (
+        <ul className="list-disc pl-5 space-y-1 text-sm opacity-90">
+          {p.keyContrib.map((c) => (
+            <li key={c.slice(0, 40)}>{c}</li>
+          ))}
+        </ul>
+      ),
+    },
+    visuals,
+  ];
+}
+
+/* ---------------------------------------------------
+   Project #1 — Moses
+-----------------------------------------------------*/
+const mosesCards: BentoCardProps[] = [
   {
-    title: "Unqueue",
-    description: "E-commerce platform for selling digital products",
-    image: "/assets/unqueue.webm",
-    href: "https://unqueue.shop/",
+    label: "#1",
+    className:
+      "col-span-12 lg:col-start-1 lg:col-span-10 lg:row-start-1 lg:row-span-1",
+    backgroundUrl: "/assets/projects/moses/project2.png",
+    backgroundPosition: "50% 35%", // unified framing
+    backgroundFit: "cover",
+    scrim: "radial",
+    frosted: true, // unified frosted
+    title: (
+      <div className="space-y-3">
+        <h2 className="text-3xl md:text-4xl font-semibold leading-tight">
+          AI Representation of Moses Williams at Peale’s Philadelphia Museum
+        </h2>
+        <p className="text-sm opacity-95">
+          <strong>Engine &amp; Tools:</strong> Unity (2022.3.18f1), Convai, custom
+          dataset design, narrative scripting, AI-assisted editorial tools (ChatGPT, GitHub Copilot, MidJourney)
+          <br />
+          <strong>Project Length:</strong> 6 months
+        </p>
+      </div>
+    ),
   },
   {
-    title: "InfiniteVPS",
-    description: "High performance VPS hosting solution",
-    image: "/assets/infinitevps.webm",
-    href: "#",
+    label: "Key Skills Demonstrated",
+    className:
+      "col-span-12 lg:col-start-11 lg:col-span-2 lg:row-start-1 lg:row-span-1",
+    description: (
+      <ul className="list-disc pl-5 space-y-1 text-sm opacity-90">
+        <li>Narrative design (branching dialogue, educational scaffolding)</li>
+        <li>Systems design (player choice loop with fact/speculation/silence outcomes)</li>
+        <li>Iteration & testing (evaluation rounds with experts + pilot users)</li>
+        <li>Research integration (archival data, ethical frameworks applied to gameplay)
+</li>
+      </ul>
+    ),
   },
   {
-    title: "TranslateBot",
-    description: "Powerful Multilingual Translation Bot for Discord",
-    image: "/assets/translate_bot.webm",
-    href: "https://translatebot.app/",
+    label: "Description & Interaction Logic",
+    className:
+      "col-span-12 md:col-span-6 lg:col-start-1 lg:col-span-6 lg:row-start-2 lg:row-span-1",
+    description: (
+      <p className="text-sm leading-6 opacity-90">
+        A graduate thesis project that explores how AI can represent marginalised
+        historical figures whose voices are missing from the archive. The prototype builds a
+        conversational AI of Moses Williams (c.1775–1825)… Dialogue separates facts,
+        speculation, and archival silences to prompt critical reflection.
+      </p>
+    ),
   },
   {
-    title: "Wrona",
-    description: "Robotics-focused technology company",
-    image: "/assets/wrona.jpeg",
-    href: "https://www.wrona.com/",
+    label: "Key Contributions",
+    className:
+      "col-span-12 md:col-span-6 lg:col-start-7 lg:col-span-6 lg:row-start-2 lg:row-span-1",
+    description: (
+      <ul className="list-disc pl-5 space-y-1 text-sm opacity-90">
+        <li>Designed the core interaction loop revealing fact/speculation/silence.</li>
+        <li>Built a Unity museum scene integrated with Convai; iterated with experts.</li>
+        <li>Balanced branching dialogue pacing via 15+ pilot tests.</li>
+        <li>Created a bespoke historical dataset; kept interpretation transparent.</li>
+        <li>Applied Hartman & Caswell frameworks to align ethics & narrative.</li>
+      </ul>
+    ),
+  },
+  // visuals (kept default — swap to a custom gallery if you want)
+  DEFAULT_VISUALS,
+];
+
+/* ---------------------------------------------------
+   Project #2 — Pygon
+-----------------------------------------------------*/
+const pygonCards: BentoCardProps[] = [
+  ...makeCards({
+    label: "#2",
+    heroTitle: "The Legend of Pygon (released later as CodeStrike on Steam)",
+    tools: "Unity, Figma (UI/UX), custom scripting",
+    length: "8 months (internship period)",
+    description:
+      "Educational adventure introducing Python through logic puzzles, storytelling, and interactive play; difficulty and rewards support young learners.",
+    keyContrib: [
+      "Designed puzzle loops tied to narrative progression.",
+      "Ran 3 playtest rounds; tuned challenge order & rewards.",
+      "Prototyped UI in Figma; refined placement/contrast/readability.",
+      "Built/tuned VFX, sound, and lighting to guide focus.",
+      "Aligned story beats with learning mechanics in a small team.",
+    ],
+    skills: [
+      "Systems design (puzzle loops & progression)",
+      "Iteration & playtesting with child users",
+      "UI/UX prototyping for accessibility",
+      "Narrative integration with learning goals",
+      "Team collaboration",
+    ],
+    backgroundUrl: "/assets/projects/pygon/back.png",
+    backgroundPosition: "40% 65%",
+    frosted: true,
+    // custom visuals for #2 (example)
+    galleryItems: [
+            { src: "/assets/projects/pygon/demo.mp4", type: "video", poster: "/assets/projects/pygon/pygon.png" },
+      { src: "/assets/projects/pygon/back.png", type: "image", alt: "Pygon UI mock" },
+            { src: "/assets/projects/pygon/pic2.png", type: "image", alt: "Pygon UI mock" },
+      { src: "/assets/projects/pygon/pic3.png", type: "image", alt: "Pygon UI mock" },
+      { src: "/assets/projects/pygon/pic4.png", type: "image", alt: "Pygon UI mock" },
+      { src: "/assets/projects/pygon/pic5.png", type: "image", alt: "Pygon UI mock" },
+      { src: "/assets/projects/pygon/pic6.png", type: "image", alt: "Pygon UI mock" },
+
+      { src: "/assets/projects/pygon/pic7.png", type: "image", alt: "Puzzle screen" },
+      // { src: "/assets/projects/pygon/shot3.jpg", type: "image", alt: "Gameplay moment" },
+    ],
+  }),
+];
+
+/* ---------------------------------------------------
+   Projects #3 — #16 (each with its own visuals)
+-----------------------------------------------------*/
+const OTHER_PROJECTS: BasicProject[] = [
+  {
+    label: "#3",
+    heroTitle: "AR Experience – Engage with The Office",
+    tools: "Unity, Vuforia, Convai",
+    length: "~6 weeks",
+    description:
+      "AR promotional prototype where barcode scans unlock AR scenes and a Convai-powered chat with Dwight Schrute. Demonstrates branded interactive experiences merging AR with conversational AI.",
+    keyContrib: [
+      "Built barcode→scene loop; iterated for fast, stable recognition.",
+      "Integrated Convai; refined dialogue to feel authentic and on-brand.",
+      "Optimised an explorable AR set for mobile performance.",
+      "User-tested pacing; tuned dialogue length & transitions.",
+    ],
+    skills: [
+      "Unity + Vuforia + Convai integration",
+      "Systems design (barcode-triggered AR & dialogue pacing)",
+      "Iteration & testing (recognition stability, timing)",
+      "Performance optimisation for mobile AR",
+      "Interactive marketing creativity",
+    ],
+    backgroundUrl: "/assets/projects/office/demo.png",
+        backgroundPosition: "40% 65%",
+
+    galleryItems: [
+      // { src: "/assets/projects/office/shot1.jpg", type: "image", alt: "AR scan UI" },
+      // { src: "/assets/projects/office/shot2.jpg", type: "image", alt: "AR scene 1" },
+      { src: "/assets/projects/office/demo.mp4", type: "video", poster: "/assets/projects/office/demo.png" },
+      // { src: "/assets/projects/office/shot3.jpg", type: "image", alt: "Dialogue with Dwight" },
+    ],
   },
   {
-    title: "This website",
-    description: "My personal website",
-    image: "/assets/portfolio.webm",
-    href: "https://github.com/wendoj/portfolio",
+    label: "#4",
+    heroTitle: "Silk Road Chronicles",
+    tools: "Unreal Engine 5 (Blueprints), 2D art, custom UI scripting",
+    length: "~1.5 months",
+    description:
+      "Educational 2D platformer where inventory & trading choices drive progression while NPC dialogue delivers Silk Road history.",
+    keyContrib: [
+      "Designed levels encouraging exploration toward key trades.",
+      "Built inventory & trading systems in Blueprints; tuned pacing.",
+      "Balanced item values/trade frequency via multiple test runs.",
+      "Designed readable inventory UI; refined after feedback.",
+    ],
+    skills: [
+      "Systems design (inventory & trading loop)",
+      "Level design & environment flow",
+      "Balancing & iteration",
+      "UI/UX for inventory clarity",
+      "Narrative integration",
+    ],
+    backgroundUrl: "/assets/projects/silk/pic1.png",
+            backgroundPosition: "40% 65%",
+
+    galleryItems: [
+            { src: "/assets/projects/silk/silk.mp4", type: "video", poster: "/assets/projects/silk/pic4.png" },
+      { src: "/assets/projects/silk/pic1.png", type: "image", alt: "Market scene" },
+      { src: "/assets/projects/silk/pic2.png", type: "image", alt: "Trade UI" },
+            { src: "/assets/projects/silk/pic6.png", type: "image", alt: "Trade UI" },
+      { src: "/assets/projects/silk/pic7.png", type: "image", alt: "Trade UI" },
+      { src: "/assets/projects/silk/pic8.png", type: "image", alt: "Trade UI" },
+
+      // { src: "/assets/projects/silk/shot3.jpg", type: "image", alt: "Platforming level" },
+    ],
+  },
+  {
+    label: "#5",
+    heroTitle: "Exitless (Puzzle Prototype)",
+    tools: "Unreal Engine 5",
+    length: "~1 month",
+    description:
+      "First-person puzzle prototype featuring portal traversal and high-risk choices; wrong portals trigger stealth chase by 'weeping angel' enemies.",
+    keyContrib: [
+      "Designed portal traversal as core progression mechanic.",
+      "Added high-risk decision points spawning enemies on errors.",
+      "Tuned balance between puzzle flow and chase tension.",
+      "Implemented all systems & AI solo within one month.",
+    ],
+    skills: [
+      "Systems design (portal gating)",
+      "Balancing risk/reward",
+      "AI behaviour tuning",
+      "End-to-end solo prototyping",
+    ],
+    backgroundUrl: "/assets/projects/exitless/pic1.png",
+            backgroundPosition: "40% 65%",
+
+    galleryItems: [
+      
+      { src: "/assets/projects/exitless/exitless.mp4", type: "video", poster: "/assets/projects/exitless/pic1.png" },
+     
+           { src: "/assets/projects/exitless/demo.mp4", type: "video", poster: "/assets/projects/exitless/pic3.png" },
+ { src: "/assets/projects/exitless/pic2.png", type: "image", alt: "Puzzle hint" },
+    ],
+  },
+  {
+    label: "#6",
+    heroTitle: "Exquisite Corpse – Whimsical Heights",
+    tools: "Unity, C#, audio & environment tools",
+    length: "2 weeks",
+    description:
+      "Class collab transforming an inherited surreal prototype into a replayable obstacle-course experience with Fall Guys vibes.",
+    keyContrib: [
+      "Expanded base into escalating obstacle-course loop.",
+      "Iterated jump-pad timing & obstacle spacing via playtests.",
+      "Built menu system (pause/replay/quit) and tested usability.",
+      "Added SFX/ambience & smoother player animations.",
+    ],
+    skills: [
+      "Systems design (escalating challenges)",
+      "Iteration & testing",
+      "UX for menus & flows",
+      "Player feedback systems (animation/SFX/VFX)",
+      "Adaptability on inherited code",
+    ],
+    backgroundUrl: "/assets/projects/exquisite/pic3.png",
+            backgroundPosition: "40% 5%",
+
+    galleryItems: [
+      
+      { src: "/assets/projects/exquisite/demo.mp4", type: "video", poster: "/assets/projects/exquisite/pic2.png" },
+      { src: "/assets/projects/exquisite/pic1.png", type: "image", alt: "Menu UI" },
+    ],
+  },
+  {
+    label: "#7",
+    heroTitle: "Purrfect Protector",
+    tools: "Unity, Figma (UI/UX), audio tools",
+    length: "~1.5 months",
+    description:
+      "Arcade prototype inspired by a Scottish folktale: clear a house of ghost mice under time pressure using power-ups and stylised feedback.",
+    keyContrib: [
+      "Designed time-limited core loop with escalating tension.",
+      "Balanced spawn rates & power-ups through team testing.",
+      "Built menus/overlays; refined for clarity in fast play.",
+      "Added stylised VFX and tuned audio layers for feedback.",
+    ],
+    skills: [
+      "Systems design (time-pressure arcade loop)",
+      "Iteration & balancing",
+      "UI/UX for fast-paced clarity",
+      "Player feedback (VFX/audio)",
+      "Narrative integration of folklore",
+    ],
+    backgroundUrl: "/assets/projects/purr/pic4.png",
+            backgroundPosition: "40% 65%",
+
+    frosted: true,
+    galleryItems: [
+     
+      { src: "/assets/projects/purr/demo1.mp4", type: "video", poster: "/assets/projects/purr/pic2.png" },
+            { src: "/assets/projects/purr/demo2.mp4", type: "video", poster: "/assets/projects/purr/pic3.png" },
+
+      { src: "/assets/projects/purr/pic1.png", type: "image", alt: "Win screen" },
+      
+    ],
+  },
+  {
+    label: "#8",
+    heroTitle: "Companionship – Interactive Dog",
+    tools: "Unreal Engine 5 (Blueprints, Behaviour Trees)",
+    length: "~3 weeks",
+    description:
+      "Prototype companion dog with commands (follow, bark, fetch, sit) driven by a Behaviour Tree for responsive, natural reactions.",
+    keyContrib: [
+      "Built base behaviour tree & state transitions.",
+      "Refined command responsiveness & animation timing.",
+      "Designed extendable framework for new commands.",
+      "Debugged & optimised Blueprint performance.",
+    ],
+    skills: [
+      "AI systems design (behaviour trees)",
+      "Team iteration & responsiveness tuning",
+      "Systems architecture for extensibility",
+      "Experience tuning (natural pacing)",
+      "UE5 Blueprint fluency",
+    ],
+    backgroundUrl: "/assets/projects/dog/pic3.png",
+            backgroundPosition: "40% 25%",
+
+    galleryItems: [
+
+      { src: "/assets/projects/dog/demo.mp4", type: "video", poster: "/assets/projects/dog/pic1.png" },
+      { src: "/assets/projects/dog/pic2.png", type: "image", alt: "Fetch sequence" },
+            { src: "/assets/projects/dog/pic3.png", type: "image", alt: "Fetch sequence" },
+
+    ],
+  },
+  {
+    label: "#9",
+    heroTitle: "Frames of the Mind",
+    tools: "Unreal Engine 5",
+    length: "~2.5 weeks",
+    description:
+      "Experimental collaboration merging photography & games; players explore dreamlike spaces with a disruptive 'memory burn' mechanic.",
+    keyContrib: [
+      "Designed the 'memory burn' and tuned timing/intensity.",
+      "Built surreal spaces blending photographic elements.",
+      "Adjusted pacing via layout; avoided disorientation.",
+      "Aligned mechanics to artistic intent with a videographer.",
+    ],
+    skills: [
+      "Experimental systems (disruptive mechanic)",
+      "Environmental design (surreal blends)",
+      "Iteration on pacing & transitions",
+      "Cross-disciplinary collaboration",
+      "Atmosphere design (AV layers)",
+    ],
+    backgroundUrl: "/assets/projects/frames/pic1.png",
+            backgroundPosition: "40% 5%",
+
+    frosted: true,
+    galleryItems: [
+   
+      { src: "/assets/projects/frames/ram.mp4", type: "video", poster: "/assets/projects/frames/pic1.png" },
+      { src: "/assets/projects/frames/pic2.png", type: "image", alt: "Photo blend room" },
+            { src: "/assets/projects/frames/pic3.png", type: "image", alt: "Photo blend room" },
+
+    ],
+  },
+  {
+    label: "#10",
+    heroTitle: "Eva’s Dream",
+    tools: "Unreal Engine 5",
+    length: "1 week",
+    description:
+      "Narrative puzzle built around Kishōtenketsu. Orb collection unlocks doors toward a cinematic twist ending; emphasis on mood & pacing.",
+    keyContrib: [
+      "Designed orb→door progression & rising tension.",
+      "Iterated placements to keep momentum.",
+      "Built cutscenes delivering the twist; tuned timing.",
+      "Crafted sound/lighting for emotional impact.",
+    ],
+    skills: [
+      "Narrative design (Kishōtenketsu)",
+      "Progression loop design",
+      "Rapid playtest iteration",
+      "Emotional audio/lighting design",
+      "End-to-end one-week build",
+    ],
+    backgroundUrl: "/assets/projects/eva/pic4.png",
+            backgroundPosition: "40% 25%",
+
+    galleryItems: [
+     
+      { src: "/assets/projects/eva/eva.mp4", type: "video", poster: "/assets/projects/eva/pic1.png" },
+      { src: "/assets/projects/eva/pic3.png", type: "image", alt: "Twist cutscene" },
+    ],
+  },
+  {
+    label: "#11",
+    heroTitle: "Night Watcher",
+    tools: "Unreal Engine 5",
+    length: "1 week",
+    description:
+      "Comfort-game prototype: guide a glowing-tusked elephant beneath the Northern Lights, purifying orbs in a calm, atmospheric loop.",
+    keyContrib: [
+      "Designed soothing purification loop and rhythm.",
+      "Balanced pacing via spawn & timing adjustments.",
+      "Built/ lit an aurora environment for clarity & ambience.",
+      "Layered ambient audio for a consistently calming mood.",
+    ],
+    skills: [
+      "Meditative systems design",
+      "Iteration for stress-free flow",
+      "Lighting & atmosphere",
+      "Audio ambience design",
+      "Experiential design",
+    ],
+    backgroundUrl: "/assets/projects/night/pic1.png",
+            backgroundPosition: "40% 45%",
+
+    galleryItems: [
+      
+      { src: "/assets/projects/night/whisperer.mp4", type: "video", poster: "/assets/projects/night/pic1.png" },
+      { src: "/assets/projects/night/pic2.png", type: "image", alt: "Purification orb" },
+    ],
+  },
+  {
+    label: "#12",
+    heroTitle: "Art Exploration Game",
+    tools: "Unity",
+    length: "1 week",
+    description:
+      "Viewfinder-inspired prototype with four paths, each a different visual treatment; explores how art direction alone shifts mood.",
+    keyContrib: [
+      "Built 4 paths with distinct shaders/lighting.",
+      "Collected feedback on mood/readability; tuned palettes.",
+      "Spaced cues to balance exploration pacing.",
+      "Showcased art direction as a gameplay driver.",
+    ],
+    skills: [
+      "Visual systems (style as mechanic)",
+      "Shader & lighting experimentation",
+      "Iteration from player perception",
+      "Environmental storytelling",
+      "Design exploration",
+    ],
+    backgroundUrl: "/assets/projects/art/pic1.png",
+            backgroundPosition: "40% 5%",
+
+    galleryItems: [
+     
+      { src: "/assets/projects/art/art.mp4", type: "video", poster: "/assets/projects/art/pic1.png" },
+      { src: "/assets/projects/art/pic2.png", type: "image", alt: "Path C/D overview" },
+    ],
+  },
+  {
+    label: "#13",
+    heroTitle: "Red Horizon",
+    tools: "Unreal Engine 4",
+    length: "~2 weeks",
+    description:
+      "Talenthouse competition level set on Mars; focused on composition, lighting, optimisation, and readable exploration flow.",
+    keyContrib: [
+      "Designed environment flow to guide movement intuitively.",
+      "Iterated lighting/composition for navigation & mood.",
+      "Optimised meshes/textures/shaders for performance.",
+      "Balanced detail density to keep focal points clear.",
+    ],
+    skills: [
+      "Level design & composition",
+      "Lighting & atmosphere",
+      "Optimisation under constraints",
+      "Visual clarity & readability",
+      "Competition-ready polish",
+    ],
+    backgroundUrl: "/assets/projects/red/demo.jpg",
+            backgroundPosition: "40% 25%",
+
+    galleryItems: [
+     
+      { src: "/assets/projects/red/demo.mp4", type: "video", poster: "/assets/projects/red/demo.jpg" },
+      { src: "/assets/projects/red/pic1.png", type: "image", alt: "Outpost lighting" },
+            { src: "/assets/projects/red/pic2.png", type: "image", alt: "Outpost lighting" },
+
+                  { src: "/assets/projects/red/pic4.png", type: "image", alt: "Outpost lighting" },
+
+    ],
+  },
+  {
+    label: "#14",
+    heroTitle: "Serenity Stroll",
+    tools: "Unity",
+    length: "Short prototype",
+    description:
+      "A calm stroll game (guided by Thomas Brush) focusing on lighting, parallax, and environmental storytelling for mood and immersion.",
+    keyContrib: [
+      "Designed exploration loop to encourage slower play.",
+      "Implemented parallax with tuned layer speeds.",
+      "Experimented with lighting to guide focus.",
+      "Applied critique to refine atmosphere & presentation.",
+    ],
+    skills: [
+      "Environmental storytelling",
+      "Parallax & depth systems",
+      "Iteration with professional feedback",
+      "Atmosphere & polish",
+    ],
+    backgroundUrl: "/assets/projects/serenity/pic1.png",
+            backgroundPosition: "40% 65%",
+
+    frosted: true,
+    galleryItems: [
+ 
+      { src: "/assets/projects/serenity/demo.mp4", type: "video", poster: "/assets/projects/serenity/pic1.png" },
+      { src: "/assets/projects/serenity/pic2.png", type: "image", alt: "Stroll environment" },
+    ],
+  },
+  {
+    label: "#15",
+    heroTitle: "Neon Shooter",
+    tools: "Unity, C#",
+    length: "~2 weeks",
+    description:
+      "Arcade shooter where coloured orbs alter score/time; a greyscale second level challenges recognition & reaction.",
+    keyContrib: [
+      "Designed scoring/timing loop and difficulty curve.",
+      "Tuned spawn rates & penalties via 5 playtests.",
+      "Balanced colour→greyscale transition without frustration.",
+      "Implemented responsive controls & reliable hit detection.",
+    ],
+    skills: [
+      "Systems design (score/time loop)",
+      "Iteration & playtesting",
+      "Progression balancing",
+      "Player feedback (controls & feel)",
+      "Replayability design",
+    ],
+    backgroundUrl: "/assets/projects/neon/pic1.png",
+            backgroundPosition: "40% 65%",
+
+    galleryItems: [
+
+      { src: "/assets/projects/neon/demo.mp4", type: "video", poster: "/assets/projects/neon/pic1.png" },
+      { src: "/assets/projects/neon/pic2.png", type: "image", alt: "Score pop" },
+            { src: "/assets/projects/neon/pic3.png", type: "image", alt: "Score pop" },
+
+    ],
+  },
+  {
+    label: "#16",
+    heroTitle: "Roller Rush",
+    tools: "Unity, C#",
+    length: "~3 weeks",
+    description:
+      "Physics-based rolling game (first complete Unity project) with AI enemies & collectibles; emphasis on responsive controls and replayability.",
+    keyContrib: [
+      "Designed navigate/collect/avoid loop for replayability.",
+      "Balanced enemy speed & placement via 5 tests.",
+      "Refined ball physics across surfaces for consistency.",
+      "Placed collectibles to reward exploration & momentum.",
+    ],
+    skills: [
+      "Core loop & difficulty tuning",
+      "Enemy & spawn balancing",
+      "Responsive physics feel",
+      "Collectible placement for flow",
+      "Unity scripting foundations",
+    ],
+    backgroundUrl: "/assets/projects/roller/demo.png",
+            backgroundPosition: "40% 65%",
+
+    galleryItems: [
+     
+      { src: "/assets/projects/roller/demo.mp4", type: "video", poster: "/assets/projects/roller/demo.png" },
+      { src: "/assets/projects/roller/pic1.png", type: "image", alt: "Enemy chase" },
+            { src: "/assets/projects/roller/pic2.png", type: "image", alt: "Enemy chase" },
+      { src: "/assets/projects/roller/pic3.png", type: "image", alt: "Enemy chase" },
+
+    ],
   },
 ];
 
-const services = [
-  {
-    service: "Frontend Development",
-    description:
-      "Creating stellar user interfaces and web experiences using the latest technologies.",
-    icon: Code2,
-  },
-  {
-    service: "UX Design",
-    description:
-      "Building intuitive, user-centric designs that drive engagement and conversion.",
-    icon: Frame,
-  },
-  {
-    service: "SEO Optimization",
-    description:
-      "Enhancing your website's visibility in search engines for increased organic traffic.",
-    icon: SearchCheck,
-  },
-  {
-    service: "Responsive Design",
-    description:
-      "Designing websites that look and perform equally well on all devices and screen sizes.",
-    icon: MonitorSmartphone,
-  },
-  {
-    service: "Backend Development",
-    description:
-      "Developing robust, scalable server-side logic for a wide range of web applications.",
-    icon: Eye,
-  },
-];
-
+/* ---------------------------------------------------
+   Page component
+-----------------------------------------------------*/
 export default function Home() {
-  const refScrollContainer = useRef(null);
-  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const refScrollContainer = useRef<HTMLDivElement | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
-  const [current, setCurrent] = useState<number>(0);
-  const [count, setCount] = useState<number>(0);
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
 
-  // handle scroll
   useEffect(() => {
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll(".nav-link");
@@ -120,46 +756,38 @@ export default function Home() {
     }
 
     function handleScroll() {
-      let current = "";
+      let currentId = "";
       setIsScrolled(window.scrollY > 0);
 
       sections.forEach((section) => {
         const sectionTop = section.offsetTop;
         if (window.scrollY >= sectionTop - 250) {
-          current = section.getAttribute("id") ?? "";
+          currentId = section.getAttribute("id") ?? "";
         }
       });
 
       navLinks.forEach((li) => {
         li.classList.remove("nav-active");
-
-        if (li.getAttribute("href") === `#${current}`) {
+        if (li.getAttribute("href") === `#${currentId}`) {
           li.classList.add("nav-active");
-          console.log(li.getAttribute("href"));
         }
       });
     }
 
     void getLocomotive();
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     if (!carouselApi) return;
-
     setCount(carouselApi.scrollSnapList().length);
     setCurrent(carouselApi.selectedScrollSnap() + 1);
-
     carouselApi.on("select", () => {
       setCurrent(carouselApi.selectedScrollSnap() + 1);
     });
   }, [carouselApi]);
 
-  // card hover effect
   useEffect(() => {
     const tilt: HTMLElement[] = Array.from(document.querySelectorAll("#tilt"));
     VanillaTilt.init(tilt, {
@@ -174,7 +802,7 @@ export default function Home() {
 
   return (
     <Container>
-      <div ref={refScrollContainer}>
+      <div ref={refScrollContainer} className="pt-[40px]">
         <Gradient />
 
         {/* Intro */}
@@ -190,10 +818,11 @@ export default function Home() {
               data-scroll-speed=".09"
               className="flex flex-row items-center space-x-1.5"
             >
-              <span className={styles.pill}>next.js</span>
-              <span className={styles.pill}>tailwindcss</span>
-              <span className={styles.pill}>typescript</span>
+              <span className={styles.pill}>Unity</span>
+              <span className={styles.pill}>Unreal Engine</span>
+              <span className={styles.pill}>AI</span>
             </div>
+
             <div>
               <h1
                 data-scroll
@@ -206,7 +835,7 @@ export default function Home() {
                   <br />
                 </span>
                 <span className="clash-grotesk text-gradient text-6xl 2xl:text-8xl">
-                  WendoJ.
+                  Aman Chandre.
                 </span>
               </h1>
               <p
@@ -215,44 +844,48 @@ export default function Home() {
                 data-scroll-speed=".06"
                 className="mt-1 max-w-lg tracking-tight text-muted-foreground 2xl:text-xl"
               >
-                An experienced full-stack website developer with a passion for
-                crafting unique digital experiences.
+                Game Designer
               </p>
             </div>
+
             <span
               data-scroll
               data-scroll-enable-touch-speed
               data-scroll-speed=".06"
               className="flex flex-row items-center space-x-1.5 pt-6"
             >
-              <Link href="mailto:wendoj@proton.me" passHref>
+              <Link href="mailto:aman.chandre@gmail.com" passHref>
                 <Button>
                   Get in touch <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
+
+              {/* Use scrollIntoView so scroll-mt works */}
               <Button
                 variant="outline"
-                onClick={() => scrollTo(document.querySelector("#about"))}
+                onClick={() =>
+                  document
+                    .querySelector("#about")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
               >
                 Learn more
               </Button>
             </span>
 
             <div
-              className={cn(
-                styles.scroll,
-                isScrolled && styles["scroll--hidden"],
-              )}
+              className={cn(styles.scroll, isScrolled && styles["scroll--hidden"])}
+              style={{ bottom: "2.5rem" }}
             >
-              Scroll to discover{" "}
-              <TriangleDownIcon className="mt-1 animate-bounce" />
+              Scroll to discover <TriangleDownIcon className="ml-1 animate-bounce" />
             </div>
           </div>
+
           <div
             data-scroll
             data-scroll-speed="-.01"
             id={styles["canvas-container"]}
-            className="mt-14 h-full w-full xl:mt-0"
+            className="mt-10 h-full w-full xl:mt-0"
           >
             <Suspense fallback={<span>Loading...</span>}>
               <Spline scene="/assets/scene.splinecode" />
@@ -261,28 +894,23 @@ export default function Home() {
         </section>
 
         {/* About */}
-        <section id="about" data-scroll-section>
-          <div
-            data-scroll
-            data-scroll-speed=".4"
-            data-scroll-position="top"
-            className="my-14 flex max-w-6xl flex-col justify-start space-y-10"
-          >
-            <h2 className="py-16  pb-2 text-3xl font-light leading-normal tracking-tighter text-foreground xl:text-[40px]">
-              I&apos;m an experienced full-stack developer proficient in{" "}
-              <Link
-                href="https://create.t3.gg/"
-                target="_blank"
-                className="underline"
-              >
-                TypeScript, Tailwind, and Next.js
-              </Link>{" "}
-              since 2021. My experience spans from startups to mid-sized
-              companies, where I&apos;ve been instrumental in the entire product
-              design process; from ideation and wireframing, through
-              prototyping, to the delivery of the final product, all while
-              efficiently collaborating with cross-functional teams.
+        <section
+          id="about"
+          data-scroll-section
+          className="scroll-mt-[176px] md:scroll-mt-[188px] lg:scroll-mt-[290px] mb-28 md:mb-40 lg:mb-64"
+        >
+          <div className="my-20 max-w-6xl flex flex-col justify-start space-y-10">
+            <h2 className="mb-6 text-3xl font-light leading-normal tracking-tighter text-foreground xl:text-[40px]">
+              Game Designer with a strong technical foundation in Unreal
+              (C++/Blueprint/Verse) and Unity (C#), experienced in crafting gameplay
+              systems, AI behaviours, and modular frameworks. Skilled at bridging
+              design and engineering, inheriting complex codebases, and adapting to
+              evolving toolsets like Verse and Lyra. Shipped projects on Steam and
+              built prototypes in Unreal Engine 5 and UEFN. Recognised for creativity,
+              collaborative spirit, and the ability to translate ambitious concepts
+              into polished, engaging player experiences.
             </h2>
+
             <div className="grid grid-cols-2 gap-8 xl:grid-cols-3">
               {aboutStats.map((stat) => (
                 <div
@@ -298,157 +926,261 @@ export default function Home() {
                 </div>
               ))}
             </div>
+
+            {/* Skills & Tools with bottom gap to separate from Education */}
+            <div className="mt-6 border-t border-white/10 pt-6 mb-16 md:mb-20 lg:mb-24">
+              <h3 className="text-xl font-medium tracking-tight">
+                Skills <span className="text-gradient clash-grotesk">&nbsp;&amp; Tools</span>
+              </h3>
+
+              <div className="mt-5 flex flex-wrap gap-3 ">
+                {SKILLS.map((skill) => (
+                  <StarBorder
+                    key={skill}
+                    as="div"
+                    color="#00ffeaff"
+                    speed="10s"
+                    thickness={2}
+                    borderColor="rgba(72, 68, 68, 0.12)"
+                    borderWidth={2}
+                    className="shrink-0"
+                  >
+                    <span className="block whitespace-nowrap text-base font-medium tracking-tight ">
+                      {skill}
+                    </span>
+                  </StarBorder>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Projects */}
-        <section id="projects" data-scroll-section>
-          {/* Gradient */}
-          <div className="relative isolate -z-10">
+        {/* Education */}
+        <section
+          id="education"
+          data-scroll-section
+          className="scroll-mt-[50px] md:scroll-mt-[50px] lg:scroll-mt-[10px] mb-20 md:mb-20 lg:mb-40"
+        >
+          <div className=" max-w-8xl flex flex-col mb-40">
+            <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8">
+              Education
+            </h2>
+
+            <div className="mt-2 grid gap-6 md:grid-cols-2">
+              <SpotlightCard className="bg-[#070a12] min-h-[180px]" color="#5530bdff" intensity={0.25} radius={260}>
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-wrap items-baseline gap-x-2">
+                    <h3 className="text-lg font-medium tracking-tight">
+                      Antoinette Westphal College of Media Art and Design - Drexel University
+                    </h3>
+                    <span className="text-sm text-muted-foreground">Philadelphia, PA</span>
+                  </div>
+                  <div className="text-sm text-secondary-foreground">Master of Science - Digital Media</div>
+                  <div className="text-xs text-muted-foreground">2023 — 2025</div>
+                  <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+                    <li>Courses: AI in Gaming, Experimental Games, Serious Games, Game Development Studies,
+                      Game Development Foundation, Game Design 1, Designing for Interactivity, Interactivity
+                      1 & 2, In Camera Virtual Production.</li>
+                    <li>Thesis: AI Representation of Moses Williams (Graduate Thesis) Built an
+                      interactive museum prototype with branching dialogue loops; tested with 5 expert
+                      panelists (historians, educators, curator) and secured 95% approval, requiring only
+                      minor tweaks for final acceptance.</li>
+                    <li>GPA: 3.83/4</li>
+                  </ul>
+                </div>
+              </SpotlightCard>
+
+              <SpotlightCard className="bg-[#070a12] min-h-[180px]" color="#5530bdff" intensity={0.22} radius={260}>
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-wrap items-baseline gap-x-2">
+                    <h3 className="text-lg font-medium tracking-tight">
+                      D.Y. Patil Institute of Engineering and Technology - Savitribai Phule Pune University
+                    </h3>
+                    <span className="text-sm text-muted-foreground">Pune, India</span>
+                  </div>
+                  <div className="text-sm text-secondary-foreground">Bachelor of Science - Computer Engineering</div>
+                  <div className="text-xs text-muted-foreground">2017 — 2022</div>
+                  <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+                    <li>Project: Built an unsupervised ML model to detect real-time anomalies in network traffic,
+                      achieving 92% accuracy in identifying irregular behavior through clustering.</li>
+                    <li>CGPA: 7.92/10</li>
+                  </ul>
+                </div>
+              </SpotlightCard>
+            </div>
+          </div>
+        </section>
+
+        {/* Experience */}
+<section
+  id="experience"
+  data-scroll-section
+  className="scroll-mt-[50px] md:scroll-mt-[50px] lg:scroll-mt-[10px] mb-20 md:mb-20 lg:mb-40"
+>
+  <div className="max-w-8xl flex flex-col mb-40">
+    <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8">
+      Experience
+    </h2>
+
+    <div className="mt-2 grid gap-6 md:grid-cols-1">
+      <SpotlightCard
+        className="bg-[#070a12] min-h-[180px]"
+        color="#5530bdff"
+        intensity={0.24}
+        radius={260}
+      >
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <h3 className="text-lg font-medium tracking-tight">
+              Augmentastic Pvt. Ltd.
+            </h3>
+            <span className="text-sm text-muted-foreground">
+              Pune, India
+            </span>
+          </div>
+
+          <div className="text-sm text-secondary-foreground">
+            Unity 3D Developer Intern
+          </div>
+          <div className="text-xs text-muted-foreground">
+            12/2022 — 07/2023
+          </div>
+
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+            <li>
+              Transformed a serious game project by reworking UI/UX, puzzle
+              systems, and interactive mechanics—making the experience engaging
+              and clear for users.
+            </li>
+            <li>
+              Collaborated with artists and developers, adapting in-progress
+              ideas into fully playable features, many of which became the
+              foundation for the Steam release <span className="font-medium">CodeStrike</span>.
+            </li>
+            <li>
+              Recognised by the company for delivering professional-level design
+              changes that elevated overall quality.
+            </li>
+          </ul>
+        </div>
+      </SpotlightCard>
+    </div>
+  </div>
+</section>
+
+
+        {/* Projects — header + #1 */}
+        <section
+          id="projects"
+          data-scroll-section
+          className="scroll-mt-[200px] md:scroll-mt-[240px] lg:scroll-mt-[450px] py-16 md:py-20"
+        >
+          <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8 leading-[1.15] pb-1 inline-block">
+            Projects
+          </h2>
+
+          <div
+            className="relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] w-screen
+                       px-4 sm:px-6 md:px-10 lg:px-20
+                       mt-8 md:mt-10 lg:mt-12"
+          >
+            <MagicBento
+              cards={mosesCards}
+              textAutoHide={false}
+              enableStars
+              enableSpotlight
+              enableBorderGlow
+              enableMagnetism
+              enableTilt={false}
+              clickEffect
+              spotlightRadius={300}
+              particleCount={12}
+              glowColor="132, 0, 255"
+            />
+          </div>
+        </section>
+
+        {/* Project #2 */}
+        <section
+          id="projects-pygon"
+          data-scroll-section
+          className="scroll-mt-40 md:scroll-mt-44 lg:scroll-mt-48 py-16 md:py-20"
+        >
+          <h2 className="sr-only">The Legend of Pygon</h2>
+          <div
+            className="relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] w-screen
+                       px-4 sm:px-6 md:px-10 lg:px-20
+                       mt-8 md:mt-10 lg:mt-12"
+          >
+            <MagicBento
+              cards={pygonCards}
+              textAutoHide={false}
+              enableStars
+              enableSpotlight
+              enableBorderGlow
+              enableMagnetism
+              enableTilt={false}
+              clickEffect
+              spotlightRadius={300}
+              particleCount={12}
+              glowColor="132, 0, 255"
+            />
+          </div>
+        </section>
+
+        {/* Projects #3 — #16 generated */}
+        {OTHER_PROJECTS.map((p) => (
+          <section
+            key={p.label}
+            id={`projects-${parseInt(p.label.replace("#", ""), 10)}`}
+            data-scroll-section
+            className="scroll-mt-40 md:scroll-mt-44 lg:scroll-mt-48 py-16 md:py-20"
+          >
+            <h2 className="sr-only">{p.heroTitle}</h2>
             <div
-              className="absolute inset-x-0 -top-40 transform-gpu overflow-hidden blur-[100px] sm:-top-80 lg:-top-60"
-              aria-hidden="true"
+              className="relative left-1/2 right-1/2 ml-[-50vw] mr-[-50vw] w-screen
+                         px-4 sm:px-6 md:px-10 lg:px-20
+                         mt-8 md:mt-10 lg:mt-12"
             >
-              <div
-                className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary via-primary to-secondary opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-                style={{
-                  clipPath:
-                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-                }}
+              <MagicBento
+                cards={makeCards(p)}
+                textAutoHide={false}
+                enableStars
+                enableSpotlight
+                enableBorderGlow
+                enableMagnetism
+                enableTilt={false}
+                clickEffect
+                spotlightRadius={300}
+                particleCount={12}
+                glowColor="132, 0, 255"
               />
             </div>
-          </div>
-          <div data-scroll data-scroll-speed=".4" className="my-64">
-            <span className="text-gradient clash-grotesk text-sm font-semibold tracking-tighter">
-              ✨ Projects
-            </span>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight tracking-tighter xl:text-6xl">
-              Streamlined digital experiences.
-            </h2>
-            <p className="mt-1.5 text-base tracking-tight text-muted-foreground xl:text-lg">
-              I&apos;ve worked on a variety of projects, from small websites to
-              large-scale web applications. Here are some of my favorites:
-            </p>
+          </section>
+        ))}
 
-            {/* Carousel */}
-            <div className="mt-14">
-              <Carousel setApi={setCarouselApi} className="w-full">
-                <CarouselContent>
-                  {projects.map((project) => (
-                    <CarouselItem key={project.title} className="md:basis-1/2">
-                      <Card id="tilt">
-                        <CardHeader className="p-0">
-                          <Link href={project.href} target="_blank" passHref>
-                            {project.image.endsWith(".webm") ? (
-                              <video
-                                src={project.image}
-                                autoPlay
-                                loop
-                                muted
-                                className="aspect-video h-full w-full rounded-t-md bg-primary object-cover"
-                              />
-                            ) : (
-                              <Image
-                                src={project.image}
-                                alt={project.title}
-                                width={600}
-                                height={300}
-                                quality={100}
-                                className="aspect-video h-full w-full rounded-t-md bg-primary object-cover"
-                              />
-                            )}
-                          </Link>
-                        </CardHeader>
-                        <CardContent className="absolute bottom-0 w-full bg-background/50 backdrop-blur">
-                          <CardTitle className="border-t border-white/5 p-4 text-base font-normal tracking-tighter">
-                            {project.description}
-                          </CardTitle>
-                        </CardContent>
-                      </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-              <div className="py-2 text-center text-sm text-muted-foreground">
-                <span className="font-semibold">
-                  {current} / {count}
-                </span>{" "}
-                projects
-              </div>
+        {/* Contact → Profile Card */}
+        <section id="contact" className="mt-40 mb-2">
+          <div className="mx-auto max-w-6xl">
+            <div className="flex justify-center">
+              <ProfileCard
+                className="mx-auto"
+                name="Aman Chandre"
+                title="Game Designer"
+                handle="amanchandre_"
+                avatarUrl="/assets/Pic.png"
+              />
             </div>
-          </div>
-        </section>
-
-        {/* Services */}
-        <section id="services" data-scroll-section>
-          <div
-            data-scroll
-            data-scroll-speed=".4"
-            data-scroll-position="top"
-            className="my-24 flex flex-col justify-start space-y-10"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 1,
-                staggerChildren: 0.5,
-              }}
-              viewport={{ once: true }}
-              className="grid items-center gap-1.5 md:grid-cols-2 xl:grid-cols-3"
-            >
-              <div className="flex flex-col py-6 xl:p-6">
-                <h2 className="text-4xl font-medium tracking-tight">
-                  Need more info?
-                  <br />
-                  <span className="text-gradient clash-grotesk tracking-normal">
-                    I got you.
-                  </span>
-                </h2>
-                <p className="mt-2 tracking-tighter text-secondary-foreground">
-                  Here are some of the services I offer. If you have any
-                  questions, feel free to reach out.
-                </p>
-              </div>
-              {services.map((service) => (
-                <div
-                  key={service.service}
-                  className="flex flex-col items-start rounded-md bg-white/5 p-14 shadow-md backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-md"
-                >
-                  <service.icon className="my-6 text-primary" size={20} />
-                  <span className="text-lg tracking-tight text-foreground">
-                    {service.service}
-                  </span>
-                  <span className="mt-2 tracking-tighter text-muted-foreground">
-                    {service.description}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Contact */}
-        <section id="contact" data-scroll-section className="my-64">
-          <div
-            data-scroll
-            data-scroll-speed=".4"
-            data-scroll-position="top"
-            className="flex flex-col items-center justify-center rounded-lg bg-gradient-to-br from-primary/[6.5%] to-white/5 px-8 py-16 text-center xl:py-24"
-          >
-            <h2 className="text-4xl font-medium tracking-tighter xl:text-6xl">
-              Let&apos;s work{" "}
-              <span className="text-gradient clash-grotesk">together.</span>
-            </h2>
-            <p className="mt-1.5 text-base tracking-tight text-muted-foreground xl:text-lg">
-              I&apos;m currently available for freelance work and open to
-              discussing new projects.
-            </p>
-            <Link href="mailto:wendoj@proton.me" passHref>
-              <Button className="mt-6">Get in touch</Button>
-            </Link>
+            <div className="mt-6 flex justify-center">
+              <GradientText
+                as="h2"
+                className="clash-grotesk text-center text-4xl md:text-7x1 font tracking-thin"
+                colors={["#00ff73ff", "#6FB6FF", "#79F2C7"]}
+                animationSpeed={3}
+              >
+                Let&apos;s Work Together
+              </GradientText>
+            </div>
           </div>
         </section>
       </div>

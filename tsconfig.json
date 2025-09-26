@@ -8,6 +8,9 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
+    "checkJs": false,
+    "skipLibCheck": true,
+ 
 
     /* Strictness */
     "strict": true,
@@ -36,7 +39,9 @@
     "**/*.tsx",
     "**/*.cjs",
     "**/*.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "**/*.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules",
+    "public/**/*"]
 }

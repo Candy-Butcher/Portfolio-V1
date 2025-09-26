@@ -1,0 +1,80 @@
+/* ---------- MagicBento globals ---------- */
+.bento-section {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
+  --glow-radius: 200px;
+  --glow-color: 132, 0, 255; /* overridden from the React prop */
+  --border-color: #392e4e;
+  --background-dark: rgba(13, 14, 19, 0.966);
+  --white: hsl(0 0% 100%);
+}
+
+/* responsive grid layout */
+.card-responsive {
+  grid-template-columns: 1fr;
+  width: 90%;
+  margin: 0 auto;
+  padding: 0.5rem;
+}
+
+/* border glow fed by JS vars */
+.card--border-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 6px;
+  background:
+    radial-gradient(var(--glow-radius) circle at var(--glow-x) var(--glow-y),
+      rgba(var(--glow-color), calc(var(--glow-intensity) * 0.8)) 0%,
+      rgba(var(--glow-color), calc(var(--glow-intensity) * 0.4)) 30%,
+      transparent 60%);
+  border-radius: inherit;
+
+  /* “hollow” border mask */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s ease;
+  z-index: 1;
+}
+.card--border-glow:hover::after { opacity: 1; }
+.card--border-glow:hover {
+  box-shadow: 0 4px 20px rgba(46, 24, 78, 0.4), 0 0 30px rgba(132,0,255,0.2);
+}
+
+/* tiny halo behind each star particle */
+.particle::before {
+  content: "";
+  position: absolute; inset: -2px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+/* text clamps for tidy cards */
+.text-clamp-1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.text-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+/* hide horizontal scrollbar where supported */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;            /* Chrome/Safari */
+}
