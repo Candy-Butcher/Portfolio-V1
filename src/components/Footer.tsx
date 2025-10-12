@@ -48,7 +48,7 @@ export default function Footer() {
 
         {/* BRAND — add margin so it doesn't stick to "home" */}
            <Link
-          href="https://www.linkedin.com/in/aman-chandre-14b919126/" className="mr-6"
+          href="https://www.linkedin.com/in/aman-chandre/" className="mr-6"
           // aria-label="Aman Chandre — Home"
          // className="flex items-center gap-2 group"
         >

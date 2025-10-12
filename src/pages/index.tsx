@@ -260,7 +260,7 @@ const pygonCards: BentoCardProps[] = [
     label: "#2",
     heroTitle: "The Legend of Pygon (released later as CodeStrike on Steam)",
     tools: "Unity, Figma (UI/UX), custom scripting",
-    length: "8 months (internship period)",
+    length: "8 months",
     description:
       "Educational adventure introducing Python through logic puzzles, storytelling, and interactive play; difficulty and rewards support young learners.",
     keyContrib: [
@@ -1015,7 +1015,7 @@ export default function Home() {
 <section
   id="experience"
   data-scroll-section
-  className="scroll-mt-[50px] md:scroll-mt-[50px] lg:scroll-mt-[10px] mb-20 md:mb-20 lg:mb-40"
+  className="scroll-mt-[50px] md:scroll-mt-[50px] lg:scroll-mt-[120px] mb-20 md:mb-20 lg:mb-40"
 >
   <div className="max-w-8xl flex flex-col mb-40">
     <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8">
@@ -1040,7 +1040,7 @@ export default function Home() {
           </div>
 
           <div className="text-sm text-secondary-foreground">
-            Unity 3D Developer Intern
+            Unity 3D Developer
           </div>
           <div className="text-xs text-muted-foreground">
             12/2022 — 07/2023
@@ -1048,32 +1048,92 @@ export default function Home() {
 
           <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
             <li>
-              Transformed a serious game project by reworking UI/UX, puzzle
-              systems, and interactive mechanics—making the experience engaging
-              and clear for users.
+              Reworked and optimised UI, UX, and puzzle systems for a serious game project that later released commercially as CodeStrike on Steam.
             </li>
             <li>
-              Collaborated with artists and developers, adapting in-progress
-              ideas into fully playable features, many of which became the
-              foundation for the Steam release <span className="font-medium">CodeStrike</span>.
+              Built and tested interactive mechanics that improved player comprehension and engagement across tutorial and challenge levels.
             </li>
             <li>
-              Recognised by the company for delivering professional-level design
-              changes that elevated overall quality.
+              Collaborated with artists, designers, and engineers to translate evolving ideas into playable, stable features within tight production timelines.
+            </li>
+            <li>
+              Enhanced project stability by streamlining prefabs and fixing logic inconsistencies, reducing feature rework and crash frequency.
+            </li>
+            <li>
+              Contributed to the visual feedback and pacing systems that helped the game feel responsive and polished for its public launch.
             </li>
           </ul>
         </div>
       </SpotlightCard>
+      <SpotlightCard
+        className="bg-[#070a12] min-h-[180px]"
+        color="#5530bdff"
+        intensity={0.24}
+        radius={260}
+      >
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            <h3 className="text-lg font-medium tracking-tight">
+              Diaspora Games
+            </h3>
+            <span className="text-sm text-muted-foreground">
+              California, US (Remote)
+            </span>
+          </div>
+
+          <div className="text-sm text-secondary-foreground">
+            Game Developer Intern
+          </div>
+          <div className="text-xs text-muted-foreground">
+            10/2025 — current
+          </div>
+
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+             <li>
+              Developing and refining Gameplay Ability System (GAS) combat features
+              (cooldowns, status tags, stacking effects).
+            </li>
+            <li>
+              Designing and testing AI behaviour and combat encounters; balancing
+              enemy pacing for fair, engaging fights.
+            </li>
+            <li>
+              Creating/maintaining data tables and curves for scalable tuning to
+              reduce bugs and improve consistency.
+            </li>
+            <li>
+              Writing new Blueprint and C++ logic to improve performance and iteration
+              speed during internal playtests.
+            </li>
+            <li>
+              Collaborating with designers/engineers to identify gameplay issues early,
+              resulting in more stable playtest builds.
+            </li>
+            <li>
+              Contributing prototype systems that streamline testing and enhance player
+              feedback clarity for smoother combat iteration.
+            </li>
+          </ul>
+        </div>
+      </SpotlightCard>
+
+      
     </div>
+
+    
   </div>
+  
 </section>
+
+
+
 
 
         {/* Projects — header + #1 */}
         <section
           id="projects"
           data-scroll-section
-          className="scroll-mt-[200px] md:scroll-mt-[240px] lg:scroll-mt-[450px] py-16 md:py-20"
+          className="scroll-mt-[200px] md:scroll-mt-[240px] lg:scroll-mt-[500px] py-16 md:py-20"
         >
           <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8 leading-[1.15] pb-1 inline-block">
             Projects
