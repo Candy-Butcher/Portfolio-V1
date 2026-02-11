@@ -33,19 +33,72 @@ const aboutStats = [
   { label: "Technologies mastered", value: "5+" },
 ];
 
-const SKILLS = [
-  "C++",
-  "Unreal Engine 5",
-  "Blueprints",
-  "Verse",
-  "Gameplay Systems",
-  "AI / Behavior Trees",
-  "Lyra / GAS",
-  "Multiplayer & Replication",
-  "Unity",
-  "Prototyping",
-  "Performance Profiling",
-  "Git / GitHub",
+const SKILL_GROUPS: { title: string; items: string[] }[] = [
+  {
+    title: "Gameplay & AI Design",
+    items: [
+      "Combat systems",
+      "Gameplay Ability System (GAS)",
+      "AI behavior trees",
+      "State machines",
+      "Enemy behaviors",
+      "Pickups & inventory",
+      "Gameplay tuning & balance",
+      "Greyboxing & blockout",
+      "Playtest-driven iteration",
+    ],
+  },
+  {
+    title: "Game Engines & Technical Tools",
+    items: [
+      "Unreal Engine 5 / UEFN",
+      "C++",
+      "Blueprint",
+      "Verse",
+      "Unity (C#)",
+      "AR/VR prototyping ",
+      "Convai", 
+      "Vuforia",
+      "Maya",
+      "TouchDesigner",
+    ],
+  },
+  {
+    title: "UI & Player Experience",
+    items: [
+      "UI systems (HUDs, menus, flows)",
+      "Reusable UI components",
+      "UI animation & motion feedback",
+      "Interaction clarity",
+      "Accessibility-focused UX",
+      "Usability testing",
+      "Game Design Documents (GDDs)",
+    ],
+  },
+  {
+    title: "Narrative & Experiential Design",
+    items: [
+      "Interactive storytelling",
+      "Environmental pacing",
+      "Emotional gameplay design",
+      "Narrative-driven spaces",
+      "Player guidance (layout & mechanics)",
+    ],
+  },
+  {
+    title: "Design & Prototyping Tools",
+    items: ["Figma", "Adobe After Effects", "Adobe Photoshop"],
+  },
+  {
+    title: "Collaboration & Production",
+    items: [
+      "Cross-disciplinary teamwork",
+      "Git workflows",
+      "Rapid prototyping",
+      "Agile-style iteration",
+      "Playtest documentation",
+    ],
+  },
 ];
 
 /* ---------------------------------------------------
@@ -260,7 +313,7 @@ const pygonCards: BentoCardProps[] = [
     label: "#2",
     heroTitle: "The Legend of Pygon (released later as CodeStrike on Steam)",
     tools: "Unity, Figma (UI/UX), custom scripting",
-    length: "8 months",
+    length: "8 months (internship period)",
     description:
       "Educational adventure introducing Python through logic puzzles, storytelling, and interactive play; difficulty and rewards support young learners.",
     keyContrib: [
@@ -738,6 +791,7 @@ const OTHER_PROJECTS: BasicProject[] = [
 -----------------------------------------------------*/
 export default function Home() {
   const refScrollContainer = useRef<HTMLDivElement | null>(null);
+  const locoRef = useRef<any>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
   const [current, setCurrent] = useState(0);
@@ -747,13 +801,14 @@ export default function Home() {
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll(".nav-link");
 
-    async function getLocomotive() {
-      const Locomotive = (await import("locomotive-scroll")).default;
-      new Locomotive({
-        el: refScrollContainer.current ?? new HTMLElement(),
-        smooth: true,
-      });
-    }
+async function getLocomotive() {
+  const Locomotive = (await import("locomotive-scroll")).default;
+  const instance = new Locomotive({
+    el: refScrollContainer.current ?? new HTMLElement(),
+    smooth: true,
+  });
+  locoRef.current = instance;
+}
 
     function handleScroll() {
       let currentId = "";
@@ -818,9 +873,11 @@ export default function Home() {
               data-scroll-speed=".09"
               className="flex flex-row items-center space-x-1.5"
             >
-              <span className={styles.pill}>Unity</span>
-              <span className={styles.pill}>Unreal Engine</span>
+              <span className={styles.pill}>Game Design</span>
+              <span className={styles.pill}>UI/UX</span>
+              <span className={styles.pill}>Unity/Unreal Engine</span>
               <span className={styles.pill}>AI</span>
+              
             </div>
 
             <div>
@@ -854,28 +911,35 @@ export default function Home() {
               data-scroll-speed=".06"
               className="flex flex-row items-center space-x-1.5 pt-6"
             >
-              <Link href="mailto:aman.chandre@gmail.com" passHref>
-                <Button>
-                  Get in touch <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button
+  type="button"
+  onClick={() => {
+    window.location.href = "mailto:aman.chandre@gmail.com";
+  }}
+>
+  Get in touch <ChevronRight className="ml-1 h-4 w-4" />
+</Button>
 
               {/* Use scrollIntoView so scroll-mt works */}
-              <Button
-                variant="outline"
-                onClick={() =>
-                  document
-                    .querySelector("#about")
-                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
-                }
-              >
-                Learn more
-              </Button>
+             <Button
+  variant="outline"
+  onClick={() => {
+    if (locoRef.current?.scrollTo) {
+      locoRef.current.scrollTo("#about", { offset: -80, duration: 1 });
+      return;
+    }
+    document
+      .querySelector("#about")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }}
+>
+  Learn more
+</Button>
             </span>
 
-            <div
+           <div
               className={cn(styles.scroll, isScrolled && styles["scroll--hidden"])}
-              style={{ bottom: "2.5rem" }}
+              style={{ bottom: "3rem", zIndex: 50 }}
             >
               Scroll to discover <TriangleDownIcon className="ml-1 animate-bounce" />
             </div>
@@ -885,7 +949,7 @@ export default function Home() {
             data-scroll
             data-scroll-speed="-.01"
             id={styles["canvas-container"]}
-            className="mt-10 h-full w-full xl:mt-0"
+            className="mt-10 flex w-full justify-center xl:mt-0"
           >
             <Suspense fallback={<span>Loading...</span>}>
               <Spline scene="/assets/scene.splinecode" />
@@ -897,18 +961,12 @@ export default function Home() {
         <section
           id="about"
           data-scroll-section
-          className="scroll-mt-[176px] md:scroll-mt-[188px] lg:scroll-mt-[290px] mb-28 md:mb-40 lg:mb-64"
+          className="scroll-mt-[40px] md:scroll-mt-[40px] lg:scroll-mt-[1060px] mb-28 md:mb-40 lg:mb-64"
+           
         >
           <div className="my-20 max-w-6xl flex flex-col justify-start space-y-10">
             <h2 className="mb-6 text-3xl font-light leading-normal tracking-tighter text-foreground xl:text-[40px]">
-              Game Designer with a strong technical foundation in Unreal
-              (C++/Blueprint/Verse) and Unity (C#), experienced in crafting gameplay
-              systems, AI behaviours, and modular frameworks. Skilled at bridging
-              design and engineering, inheriting complex codebases, and adapting to
-              evolving toolsets like Verse and Lyra. Shipped projects on Steam and
-              built prototypes in Unreal Engine 5 and UEFN. Recognised for creativity,
-              collaborative spirit, and the ability to translate ambitious concepts
-              into polished, engaging player experiences.
+             Game Designer with a strong technical foundation, specializing in gameplay systems, combat design, and player experience. Experienced in Unreal Engine (C++/Blueprint/GAS/Verse) and Unity (C#), with a focus on building clear, responsive mechanics and iterating through playtesting. Comfortable bridging design and engineering, inheriting complex systems, and turning ambitious concepts into polished, shippable experiences.
             </h2>
 
             <div className="grid grid-cols-2 gap-8 xl:grid-cols-3">
@@ -926,32 +984,47 @@ export default function Home() {
                 </div>
               ))}
             </div>
+  
 
             {/* Skills & Tools with bottom gap to separate from Education */}
-            <div className="mt-6 border-t border-white/10 pt-6 mb-16 md:mb-20 lg:mb-24">
-              <h3 className="text-xl font-medium tracking-tight">
-                Skills <span className="text-gradient clash-grotesk">&nbsp;&amp; Tools</span>
-              </h3>
+       <div className="mt-6 border-t border-white/10 pt-6 mb-16 md:mb-20 lg:mb-24">
+  <h3 className="text-xl font-medium tracking-tight">
+    Skills <span className="text-gradient clash-grotesk">&nbsp;&amp; Tools</span>
+  </h3>
 
-              <div className="mt-5 flex flex-wrap gap-3 ">
-                {SKILLS.map((skill) => (
-                  <StarBorder
-                    key={skill}
-                    as="div"
-                    color="#00ffeaff"
-                    speed="10s"
-                    thickness={2}
-                    borderColor="rgba(72, 68, 68, 0.12)"
-                    borderWidth={2}
-                    className="shrink-0"
-                  >
-                    <span className="block whitespace-nowrap text-base font-medium tracking-tight ">
-                      {skill}
-                    </span>
-                  </StarBorder>
-                ))}
-              </div>
-            </div>
+  {/* Neat + compact: consistent category cards + grid-aligned chips */}
+  <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    {SKILL_GROUPS.map((group) => (
+      <div
+        key={group.title}
+        className="rounded-2xl border border-white/10 bg-white/[0.02] p-4"
+      >
+        <h4 className="text-sm md:text-base font-medium tracking-tight text-muted-foreground">
+          {group.title}
+        </h4>
+
+        <div className="mt-3 grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(160px,1fr))]">
+          {group.items.map((skill) => (
+            <StarBorder
+              key={`${group.title}-${skill}`}
+              as="div"
+              color="#00ffeaff"
+              speed="10s"
+              thickness={2}
+              borderColor="rgba(72, 68, 68, 0.12)"
+              borderWidth={2}
+              className="w-full"
+            >
+              <span className="block w-full text-center text-xs md:text-sm font-medium tracking-tight">
+                {skill}
+              </span>
+            </StarBorder>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
           </div>
         </section>
 
@@ -959,7 +1032,8 @@ export default function Home() {
         <section
           id="education"
           data-scroll-section
-          className="scroll-mt-[50px] md:scroll-mt-[50px] lg:scroll-mt-[10px] mb-20 md:mb-20 lg:mb-40"
+          className="scroll-mt-[96px] md:scroll-mt-[112px] lg:scroll-mt-[128px] mb-20 md:mb-20 lg:mb-40"
+
         >
           <div className=" max-w-8xl flex flex-col mb-40">
             <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8">
@@ -1015,7 +1089,7 @@ export default function Home() {
 <section
   id="experience"
   data-scroll-section
-  className="scroll-mt-[50px] md:scroll-mt-[50px] lg:scroll-mt-[120px] mb-20 md:mb-20 lg:mb-40"
+  className="scroll-mt-[10px] md:scroll-mt-[510px] lg:scroll-mt-[503px] mb-20 md:mb-20 lg:mb-40"
 >
   <div className="max-w-8xl flex flex-col mb-40">
     <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8">
@@ -1023,117 +1097,135 @@ export default function Home() {
     </h2>
 
     <div className="mt-2 grid gap-6 md:grid-cols-1">
-      <SpotlightCard
-        className="bg-[#070a12] min-h-[180px]"
-        color="#5530bdff"
-        intensity={0.24}
-        radius={260}
-      >
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-baseline gap-x-2">
-            <h3 className="text-lg font-medium tracking-tight">
-              Augmentastic Pvt. Ltd.
-            </h3>
-            <span className="text-sm text-muted-foreground">
-              Pune, India
-            </span>
-          </div>
+  {/* Cubilete Cup */}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">Cubilete Cup</h3>
+        <span className="text-sm text-muted-foreground">Nevada, US (Remote)</span>
+      </div>
 
-          <div className="text-sm text-secondary-foreground">
-            Unity 3D Developer
-          </div>
-          <div className="text-xs text-muted-foreground">
-            12/2022 — 07/2023
-          </div>
+      <div className="text-sm text-secondary-foreground">
+        Digital Video Game Developer Intern
+      </div>
+      <div className="text-xs text-muted-foreground">Nov 2025 — Present</div>
 
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
-            <li>
-              Reworked and optimised UI, UX, and puzzle systems for a serious game project that later released commercially as CodeStrike on Steam.
-            </li>
-            <li>
-              Built and tested interactive mechanics that improved player comprehension and engagement across tutorial and challenge levels.
-            </li>
-            <li>
-              Collaborated with artists, designers, and engineers to translate evolving ideas into playable, stable features within tight production timelines.
-            </li>
-            <li>
-              Enhanced project stability by streamlining prefabs and fixing logic inconsistencies, reducing feature rework and crash frequency.
-            </li>
-            <li>
-              Contributed to the visual feedback and pacing systems that helped the game feel responsive and polished for its public launch.
-            </li>
-          </ul>
-        </div>
-      </SpotlightCard>
-      <SpotlightCard
-        className="bg-[#070a12] min-h-[180px]"
-        color="#5530bdff"
-        intensity={0.24}
-        radius={260}
-      >
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-baseline gap-x-2">
-            <h3 className="text-lg font-medium tracking-tight">
-              Diaspora Games
-            </h3>
-            <span className="text-sm text-muted-foreground">
-              California, US (Remote)
-            </span>
-          </div>
-
-          <div className="text-sm text-secondary-foreground">
-            Game Developer Intern
-          </div>
-          <div className="text-xs text-muted-foreground">
-            10/2025 — current
-          </div>
-
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
-             <li>
-              Developing and refining Gameplay Ability System (GAS) combat features
-              (cooldowns, status tags, stacking effects).
-            </li>
-            <li>
-              Designing and testing AI behaviour and combat encounters; balancing
-              enemy pacing for fair, engaging fights.
-            </li>
-            <li>
-              Creating/maintaining data tables and curves for scalable tuning to
-              reduce bugs and improve consistency.
-            </li>
-            <li>
-              Writing new Blueprint and C++ logic to improve performance and iteration
-              speed during internal playtests.
-            </li>
-            <li>
-              Collaborating with designers/engineers to identify gameplay issues early,
-              resulting in more stable playtest builds.
-            </li>
-            <li>
-              Contributing prototype systems that streamline testing and enhance player
-              feedback clarity for smoother combat iteration.
-            </li>
-          </ul>
-        </div>
-      </SpotlightCard>
-
-      
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+          Owned the design and implementation of interactive gameplay UI systems in
+          Unity (C#), improving responsiveness and player feedback in a multiplayer
+          mobile game.
+        </li>
+        <li>
+          Designed and implemented menu flows and interactive UI components to improve
+          clarity, pacing, and player engagement.
+        </li>
+        <li>
+          Built animated UI feedback and gameplay-supporting visuals that increased
+          perceived polish and moment-to-moment responsiveness.
+        </li>
+        <li>
+          Debugged gameplay and UI interaction logic, resolving stability and navigation
+          issues across networked builds.
+        </li>
+        <li>
+          Participated in regular playtests, documenting findings and iterating on UI
+          layouts/interactions with developers to fix usability issues.
+        </li>
+      </ul>
     </div>
+  </SpotlightCard>
 
-    
+  {/* Diaspora Games */}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">Diaspora Games</h3>
+        <span className="text-sm text-muted-foreground">California, US (Remote)</span>
+      </div>
+
+      <div className="text-sm text-secondary-foreground">Game Developer Intern</div>
+      <div className="text-xs text-muted-foreground">May 2025 — Jul 2025</div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+          Implemented and iterated on third-person combat gameplay features using Unreal
+          Engine Gameplay Ability System (GAS), balancing responsiveness, readability,
+          and designer intent.
+        </li>
+        <li>
+          Implemented GAS-driven combat with cooldowns, status tags, and stacking effects,
+          maintaining time-to-kill (TTK) stability within ±10% across playtests.
+        </li>
+        <li>
+          Designed and tuned a card-based combat loop (draw / play / resolve) with an
+          energy economy using Blueprint and C++.
+        </li>
+        <li>
+          Investigated and fixed gameplay bugs identified during playtests, collaborating
+          with QA and designers to refine balance and feel.
+        </li>
+        <li>
+          Replaced hard-coded values with Data Tables and Curves, reducing iteration time
+          by ~30% and eliminating duplicate-effect bugs.
+        </li>
+      </ul>
+    </div>
+  </SpotlightCard>
+
+  {/* Augmentastic */}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">Augmentastic Pvt. Ltd.</h3>
+        <span className="text-sm text-muted-foreground">Pune, India</span>
+      </div>
+
+      <div className="text-sm text-secondary-foreground">Unity 3D Developer</div>
+      <div className="text-xs text-muted-foreground">Dec 2022 — Jul 2023</div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+          Reworked UI/UX, puzzle systems, and interactive mechanics to make a serious game
+          clearer, more engaging, and easier to progress through.
+        </li>
+        <li>
+          Collaborated with artists and developers to convert in-progress ideas into fully
+          playable features that later informed the Steam release{" "}
+          <span className="font-medium">CodeStrike</span>.
+        </li>
+        <li>
+          Recognized internally for delivering professional-level design and implementation
+          improvements that elevated overall product quality.
+        </li>
+      </ul>
+    </div>
+  </SpotlightCard>
+</div>
   </div>
-  
 </section>
-
-
-
 
 
         {/* Projects — header + #1 */}
         <section
           id="projects"
           data-scroll-section
-          className="scroll-mt-[200px] md:scroll-mt-[240px] lg:scroll-mt-[500px] py-16 md:py-20"
+          className="scroll-mt-[200px] md:scroll-mt-[240px] lg:scroll-mt-[850px] py-16 md:py-20"
         >
           <h2 className="text-gradient text-4xl font-semibold tracking-tight xl:text-6xl mb-8 leading-[1.15] pb-1 inline-block">
             Projects
@@ -1228,7 +1320,7 @@ export default function Home() {
                 name="Aman Chandre"
                 title="Game Designer"
                 handle="amanchandre_"
-                avatarUrl="/assets/Pic.png"
+                avatarUrl="/assets/pp.jpeg"
               />
             </div>
             <div className="mt-6 flex justify-center">
