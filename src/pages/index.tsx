@@ -313,7 +313,7 @@ const pygonCards: BentoCardProps[] = [
     label: "#2",
     heroTitle: "The Legend of Pygon (released later as CodeStrike on Steam)",
     tools: "Unity, Figma (UI/UX), custom scripting",
-    length: "8 months (internship period)",
+    length: "8 months",
     description:
       "Educational adventure introducing Python through logic puzzles, storytelling, and interactive play; difficulty and rewards support young learners.",
     keyContrib: [
@@ -1111,7 +1111,7 @@ async function getLocomotive() {
       </div>
 
       <div className="text-sm text-secondary-foreground">
-        Digital Video Game Developer Intern
+        UI Designer
       </div>
       <div className="text-xs text-muted-foreground">Nov 2025 — Present</div>
 
