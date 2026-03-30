@@ -1097,6 +1097,42 @@ async function getLocomotive() {
     </h2>
 
     <div className="mt-2 grid gap-6 md:grid-cols-1">
+  
+
+     {/* The NetVR */}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">The NetVR</h3>
+        <span className="text-sm text-muted-foreground">Texas, US (Remote)</span>
+      </div>
+
+      <div className="text-sm text-secondary-foreground">
+        Unity Developer
+      </div>
+      <div className="text-xs text-muted-foreground">March 2026 — Present</div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+          Designing and refining product screens in Figma and implementing polished UI improvements in Unity 
+
+        </li>
+        <li>
+          Enhancing the existing UI/UX to create a cleaner, sleeker, and sharper user experience 
+        </li>
+        <li>
+         Improving visual hierarchy, spacing, consistency, and usability across the product
+        </li>
+      </ul>
+    </div>
+  </SpotlightCard>
+
+
   {/* Cubilete Cup */}
   <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
@@ -1111,9 +1147,9 @@ async function getLocomotive() {
       </div>
 
       <div className="text-sm text-secondary-foreground">
-        UI Designer
+        Game Developer
       </div>
-      <div className="text-xs text-muted-foreground">Nov 2025 — Present</div>
+      <div className="text-xs text-muted-foreground">November 2025 — Present</div>
 
       <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
         <li>
@@ -1141,6 +1177,40 @@ async function getLocomotive() {
     </div>
   </SpotlightCard>
 
+ {/* Storystack*/}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">StoryStack Inc.</h3>
+        <span className="text-sm text-muted-foreground">Ontario, CA (Remote)</span>
+      </div>
+
+      <div className="text-sm text-secondary-foreground">UI Designer</div>
+      <div className="text-xs text-muted-foreground">March 2026</div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+         Contributed to a short exploratory design sprint for a children’s storytelling platform focused on ages 8–12.
+        </li>
+        <li>
+         Explored motion driven UI concepts (micro-animations, feedback loops, and interactive states) to enhance immersion and retention
+        </li>
+        <li>
+          Built a working React prototype to visualize real-time interactions and bridge design development implementation
+        </li>
+        <li>
+          Contributed to early-stage visual direction through iterative exploration
+        </li>
+      
+      </ul>
+    </div>
+  </SpotlightCard>
+
   {/* Diaspora Games */}
   <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
@@ -1155,7 +1225,7 @@ async function getLocomotive() {
       </div>
 
       <div className="text-sm text-secondary-foreground">Game Developer Intern</div>
-      <div className="text-xs text-muted-foreground">May 2025 — Jul 2025</div>
+      <div className="text-xs text-muted-foreground">May 2025 — July 2025</div>
 
       <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
         <li>
@@ -1197,7 +1267,7 @@ async function getLocomotive() {
       </div>
 
       <div className="text-sm text-secondary-foreground">Unity 3D Developer</div>
-      <div className="text-xs text-muted-foreground">Dec 2022 — Jul 2023</div>
+      <div className="text-xs text-muted-foreground">December 2022 — July 2023</div>
 
       <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
         <li>
