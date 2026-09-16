@@ -29,7 +29,7 @@ const ProfileCard = dynamic(() => import("@/components/ProfileCard"), {
 });
 
 const aboutStats = [
-  { label: "Years of experience", value: "3+" },
+  { label: "Years of experience", value: "4+" },
   { label: "Technologies mastered", value: "5+" },
 ];
 
@@ -1099,7 +1099,86 @@ async function getLocomotive() {
     <div className="mt-2 grid gap-6 md:grid-cols-1">
   
 
-     {/* The NetVR */}
+     {/* Service Now */}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">ServiceNow</h3>
+        <span className="text-sm text-muted-foreground">US (Remote)</span>
+      </div>
+
+      <div className="text-sm text-secondary-foreground">
+        Game Developer
+      </div>
+      <div className="text-xs text-muted-foreground">January 2025 — Present</div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+          Build player controllers, character movement, interaction systems, state machines, and reusable gameplay mechanics using the Unreal Gameplay Framework.
+        </li>
+        <li>
+          Develop Game AI using Behavior Trees and pathfinding to create dynamic NPC behaviors and reduce dependence on scripted interactions. 
+        </li>
+        <li>
+         Implement multiplayer gameplay using client-server architecture and network synchronization for real-time interactive experiences.
+        </li>
+        <li>
+         Profile and optimize rendering and gameplay performance using Unreal Insights, CPU/GPU profiling, materials, shaders, asset optimization, object pooling, and memory management.
+        </li>
+        <li>
+         Integrate conversational AI agents and AI SDKs into interactive gameplay experiences.
+        </li>
+      </ul>
+    </div>
+  </SpotlightCard>
+
+      {/* MindTree */}
+  <SpotlightCard
+    className="bg-[#070a12] min-h-[180px]"
+    color="#5530bdff"
+    intensity={0.24}
+    radius={260}
+  >
+    <div className="flex flex-col gap-1">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <h3 className="text-lg font-medium tracking-tight">Mindtree</h3>
+        <span className="text-sm text-muted-foreground">India</span>
+      </div>
+
+      <div className="text-sm text-secondary-foreground">
+        Game Developer
+      </div>
+      <div className="text-xs text-muted-foreground">January 2021 — August 2023</div>
+
+      <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-300">
+        <li>
+          Built player controllers, combat, interaction, inventory, progression, and reusable gameplay systems.
+        </li>
+        <li>
+          Developed modular game architecture using C#, object-oriented programming, prefabs, components, scene management, and reusable game loops. 
+        </li>
+        <li>
+         Created responsive HUDs, menu systems, Animator Controller workflows, and other UI systems.
+        </li>
+        <li>
+         Implemented gameplay behaviors using state machines, physics, collision systems, raycasting, AI behaviors, and NavMesh.
+        </li>
+        <li>
+         Profiled and optimized applications using Unity Profiler, Frame Debugger, object pooling, draw-call optimization, and memory-management techniques.
+        </li>
+        <li>
+         Delivered cross-platform builds for Android and iOS and developed AR experiences using AR Foundation, ARCore, and Vuforia.
+        </li>
+      </ul>
+    </div>
+  </SpotlightCard>
+
+     {/* The NetVR
   <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
     color="#5530bdff"
@@ -1130,10 +1209,10 @@ async function getLocomotive() {
         </li>
       </ul>
     </div>
-  </SpotlightCard>
+  </SpotlightCard> */}
 
 
-  {/* Cubilete Cup */}
+  {/* Cubilete Cup
   <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
     color="#5530bdff"
@@ -1175,10 +1254,10 @@ async function getLocomotive() {
         </li>
       </ul>
     </div>
-  </SpotlightCard>
+  </SpotlightCard> */}
 
  {/* Storystack*/}
-  <SpotlightCard
+  {/* <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
     color="#5530bdff"
     intensity={0.24}
@@ -1209,10 +1288,10 @@ async function getLocomotive() {
       
       </ul>
     </div>
-  </SpotlightCard>
+  </SpotlightCard> */}
 
   {/* Diaspora Games */}
-  <SpotlightCard
+  {/* <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
     color="#5530bdff"
     intensity={0.24}
@@ -1251,10 +1330,10 @@ async function getLocomotive() {
         </li>
       </ul>
     </div>
-  </SpotlightCard>
+  </SpotlightCard> */}
 
   {/* Augmentastic */}
-  <SpotlightCard
+  {/* <SpotlightCard
     className="bg-[#070a12] min-h-[180px]"
     color="#5530bdff"
     intensity={0.24}
@@ -1285,7 +1364,7 @@ async function getLocomotive() {
         </li>
       </ul>
     </div>
-  </SpotlightCard>
+  </SpotlightCard> */}
 </div>
   </div>
 </section>
